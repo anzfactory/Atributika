@@ -184,7 +184,10 @@ extension String {
     
     public func detectHashTags() -> [Range<String.Index>] {
         
-        return detect(regex: "[#]\\w\\S*\\b")
+        let regex = #"""
+(?<![0-9a-zA-Z'"#@=:;])#(\w*[a-zA-Z_0-9ぁ-んァ-ヶｦ-ﾟ０-９\x{3005}\x{3007}\x{303b}\x{3400}-\x{9FFF}\x{F900}-\x{FAFF}\x{20000}-\x{2FFFF}])
+"""#
+        return detect(regex: regex)
     }
     
     public func detectMentions() -> [Range<String.Index>] {
