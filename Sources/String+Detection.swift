@@ -195,8 +195,8 @@ extension String {
     public func detectHashTags() -> [Range<String.Index>] {
         
         // let regex = #"""
-(?<![0-9a-zA-Z'"#@=:;])#(\w*[a-zA-Z_0-9ぁ-んァ-ヶｦ-ﾟ０-９\x{3005}\x{3007}\x{303b}\x{3400}-\x{9FFF}\x{F900}-\x{FAFF}\x{20000}-\x{2FFFF}])
-"""#
+//(?<![0-9a-zA-Z'"#@=:;])#(\w*[a-zA-Z_0-9ぁ-んァ-ヶｦ-ﾟ０-９\x{3005}\x{3007}\x{303b}\x{3400}-\x{9FFF}\x{F900}-\x{FAFF}\x{20000}-\x{2FFFF}])
+//"""#
         // return detect(regex: regex)
         return detect(regex: "#[^[:punct:][:space:]]+")
     }
