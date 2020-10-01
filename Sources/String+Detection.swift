@@ -1,7 +1,4 @@
 //
-//  Detection.swift
-//  Atributika
-//
 //  Created by Pavel Sharanda on 21.02.17.
 //  Copyright © 2017 psharanda. All rights reserved.
 //
@@ -56,7 +53,7 @@ extension String {
             return nil
         }
         
-        var attrubutes = [String: String]()
+        var attributes = [String: String]()
         
         while parseAttributes && !tagScanner.isAtEnd {
             
@@ -83,10 +80,10 @@ extension String {
                 break
             }
             
-            attrubutes[name] = value.replacingOccurrences(of: "&quot;", with: "\"")
+            attributes[name] = value.replacingOccurrences(of: "&quot;", with: "\"")
         }
         
-        return Tag(name: tagName, attributes: attrubutes)
+        return Tag(name: tagName, attributes: attributes)
     }
     
     public func detectTags(transformers: [TagTransformer] = []) -> (string: String, tagsInfo: [TagInfo]) {
@@ -114,7 +111,8 @@ extension String {
                     if scanner.isAtEnd {
                         resultString.append("<")
                     } else {
-                        let nextChar = (scanner.string as NSString).substring(with: NSRange(location: scanner.scanLocation, length: 1))
+                        let scannerString = (scanner.string as NSString)
+                        let nextChar = scannerString.substring(with: NSRange(location: scanner.scanLocation, length: 1))
                         if CharacterSet.letters.contains(nextChar.unicodeScalars.first!) || (nextChar == "/") {
                             let tagType = scanner.scanString("/") == nil ? TagType.start : TagType.end
                             if let tagString = scanner.scanUpTo(">") {
@@ -146,6 +144,18 @@ extension String {
                                     resultString.append("<")
                                     resultString.append(tagString)
                                 }
+                            }
+                        } else if nextChar == "!", scannerString.length >= scanner.scanLocation + 3 {
+                            let afterNextChars = scannerString.substring(with: NSRange(location: scanner.scanLocation + 1, length: 2))
+                            if afterNextChars == "--" {
+                                let scanLocation = scanner.scanLocation + 3
+                                _ = scanner.scanUpTo("-->")
+                                if  scanner.scanString("-->") == nil {
+                                    scanner.scanLocation = scanLocation
+                                    resultString.append("<!--")
+                                }
+                            } else {
+                                resultString.append("<")
                             }
                         } else {
                             resultString.append("<")
@@ -184,15 +194,17 @@ extension String {
     
     public func detectHashTags() -> [Range<String.Index>] {
         
-        let regex = #"""
+        // let regex = #"""
 (?<![0-9a-zA-Z'"#@=:;])#(\w*[a-zA-Z_0-9ぁ-んァ-ヶｦ-ﾟ０-９\x{3005}\x{3007}\x{303b}\x{3400}-\x{9FFF}\x{F900}-\x{FAFF}\x{20000}-\x{2FFFF}])
 """#
-        return detect(regex: regex)
+        // return detect(regex: regex)
+        return detect(regex: "#[^[:punct:][:space:]]+")
     }
     
     public func detectMentions() -> [Range<String.Index>] {
         
-        return detect(regex: #"[@][0-9A-Za-z_]*"#)
+        // return detect(regex: #"[@][0-9A-Za-z_]*"#)
+        return detect(regex: "@[^[:punct:][:space:]]+")
     }
     
     public func detect(regex: String, options: NSRegularExpression.Options = []) -> [Range<String.Index>] {
